@@ -14,29 +14,24 @@ library(SnowballC)
 library(tm)
 library(gridExtra)
 library(corrplot)
-library(data.table)
+#library(data.table)
 
-# # SC Code
-# train <- fread("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/train.tsv")
-# test <- fread("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/test.tsv")
-# saveRDS(train, "trainfread.rds")
-# saveRDS(test, "testfread.rds")
-# 
-# train <-readRDS("trainfread.rds")
-# test <-readRDS("testfread.rds")
-# 
-# 
-# 
-# train = read.csv("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/train.tsv", sep='\t')
-# test = read.csv("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/test.tsv", sep='\t')
-# submission = read.csv('C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/sample_submission.csv')
-# all = rbind(within(train,rm('train_id','price')),within(test,rm('test_id')))
-# summary(all)
+# SC Code
+train <- fread("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/train.tsv")
+test <- fread("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/test.tsv")
+saveRDS(train, "trainfread.rds")
+saveRDS(test, "testfread.rds")
 
-train = read.csv('../input/train.tsv', sep='\t')
-test = read.csv('../input/test.tsv', sep='\t')
-submission = read.csv('../input/sample_submission.csv')
+train <-readRDS("trainfread.rds")
+test <-readRDS("testfread.rds")
 
+
+
+train = read.csv("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/train.tsv", sep='\t')
+test = read.csv("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/test.tsv", sep='\t')
+submission = read.csv('C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/sample_submission.csv')
+all = rbind(within(train,rm('train_id','price')),within(test,rm('test_id')))
+summary(all)
 
 #### In order to analyze the data more easily, you can split the set:
 
@@ -128,23 +123,23 @@ all$descWD1[all$item_description == -1] = -1
 all$descWD2 = tan(all$descWD1)
 all$descWD2[all$item_description == -1] = -1
 
+#######################################################################GOT TO HERE
 
-
-all$nameLength = str_length(all$name)
-all$nameUP = sapply(gregexpr("[A-Z]", all$name), length)
-all$nameNC = sapply(gregexpr("[0-9]", all$name), length)
-all$nameUD = (all$nameUP/all$nameLength)
-all$nameND = (all$nameNC/all$nameLength)
+all['nameLength'] = str_length(all$name)
+all['nameUP'] = sapply(gregexpr("[A-Z]", all$name), length)
+all['nameNC'] = sapply(gregexpr("[0-9]", all$name), length)
+all['nameUD'] = (all$nameUP/all$nameLength)
+all['nameND'] = (all$nameNC/all$nameLength)
 corpus = Corpus(VectorSource(all$name))
 corpus = tm_map(corpus, tolower)
 corpus = tm_map(corpus, removePunctuation)
 corpus = tm_map(corpus, removeWords, stopwords("english"))
 dataframe1 <- data.frame(text=sapply(corpus, identity),stringsAsFactors=F)
 all$name = dataframe1$text
-all$nameLength = str_length(all$name)
-all$nameWC = sapply(gregexpr("\\W+", all$name), length) + 1
-all$nameWD1 = (all$nameLength/all$nameWC)
-all$nameWD2 = tan(all$nameWD1)
+all['nameLength'] = str_length(all$name)
+all['nameWC'] = sapply(gregexpr("\\W+", all$name), length) + 1
+all['nameWD1'] = (all$nameLength/all$nameWC)
+all['nameWD2'] = tan(all$nameWD1)
 
 
 
@@ -281,31 +276,31 @@ ggplot(termFrameNh, aes(x=reorder(term,-ratio), y=ratio))+
 ### item_description
 ##################################
 
-all$box = (str_detect(all$item_description, 'box'))*1
-all$bag = (str_detect(all$item_description, 'bag'))*1
-all$come = (str_detect(all$item_description, 'come'))*1
-all$gold = (str_detect(all$item_description, 'gold'))*1
-all$icase = (str_detect(all$item_description, 'case'))*1
-all$condit = (str_detect(all$item_description, 'condit'))*1
-all$authent = (str_detect(all$item_description, 'authent'))*1
-all$origin = (str_detect(all$item_description, 'origin'))*1
-all$leather = (str_detect(all$item_description, 'leather'))*1
-all$includ = (str_detect(all$item_description, 'includ'))*1
-all$ibundl = (str_detect(all$item_description, 'bundl'))*1
-all$gb = (str_detect(all$item_description, 'gb '))*1
+all['box'] = (str_detect(all$item_description, 'box'))*1
+all['bag'] = (str_detect(all$item_description, 'bag'))*1
+all['come'] = (str_detect(all$item_description, 'come'))*1
+all['gold'] = (str_detect(all$item_description, 'gold'))*1
+all['icase'] = (str_detect(all$item_description, 'case'))*1
+all['condit'] = (str_detect(all$item_description, 'condit'))*1
+all['authent'] = (str_detect(all$item_description, 'authent'))*1
+all['origin'] = (str_detect(all$item_description, 'origin'))*1
+all['leather'] = (str_detect(all$item_description, 'leather'))*1
+all['includ'] = (str_detect(all$item_description, 'includ'))*1
+all['ibundl'] = (str_detect(all$item_description, 'bundl'))*1
+all['gb'] = (str_detect(all$item_description, 'gb '))*1
 
 ##################################
 ### name
 ##################################
 
-all$nbundl = (str_detect(all$name, 'bundl'))*1
-all$ncase = (str_detect(all$name, 'case'))*1
-all$iphon = (str_detect(all$name, 'iphon'))*1
-all$shirt = (str_detect(all$name, 'shirt'))*1
-all$ship = (str_detect(all$name, 'ship'))*1
-all$reserv = (str_detect(all$name,'reserv'))*1
-all$ring = (str_detect(all$name,'ring'))*1
-all$diamond = (str_detect(all$name,'diamond'))*1
+all['nbundl'] = (str_detect(all$name, 'bundl'))*1
+all['ncase'] = (str_detect(all$name, 'case'))*1
+all['iphon'] = (str_detect(all$name, 'iphon'))*1
+all['shirt'] = (str_detect(all$name, 'shirt'))*1
+all['ship'] = (str_detect(all$name, 'ship'))*1
+all['reserv'] = (str_detect(all$name,'reserv'))*1
+all['ring'] = (str_detect(all$name,'ring'))*1
+all['diamond'] = (str_detect(all$name,'diamond'))*1
 
 
 
@@ -341,20 +336,7 @@ nfun = nrow(funTime)
 validation=funTime[1:ntrain,]
 validation$price=train[,'price']
 testXG = funTime[(ntrain+1):nfun,]
-
-
-
-####   my code
-split=sample.split(validation$price,SplitRatio=0.99)
-
-
-
-####
-
-
-
-
-
+split=sample.split(validation,SplitRatio=0.99)
 trainXG=subset(validation,split==TRUE)
 validXG=subset(validation,split==FALSE)
 yTrainXG=trainXG$price
@@ -373,7 +355,6 @@ xgTest = xgb.DMatrix(as.matrix(testXG))
 xgPrm = list(boost='gbtree',objective='reg:linear',colsample_bytree=1,
              eta=0.11,max_depth=9,min_child_weight=1,alpha=0.3,
              lambda=0.4,gamma=0.2,subsample=0.8,seed=5,silent=TRUE)
-# This line runs the model (takes 20 - 30 min)
 xgbModel = xgb.train(xgPrm,xgTrain,nrounds=300,watchlist=list(train=xgTrain,test=xgValid))
 ypredXgbTrain = predict(xgbModel,xgTrain)
 rmseEval(yTrainXG,ypredXgbTrain)
@@ -385,106 +366,101 @@ submission$price = exp(ypredXgb)
 
 
 
-write.csv(submission,'kernelSub.csv',row.names=FALSE)
+
+rmseEval(yTrainXG,ypredXgbTrain)
+rmseEval(yValidXG,ypredXgbValid)
 
 
-# 
-# 
-# 
-# rmseEval(yTrainXG,ypredXgbTrain)
-# rmseEval(yValidXG,ypredXgbValid)
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# predEval = as.data.frame(ypredXgbValid)
-# predEval$test = yValidXG
-# predEval$error = predEval$ypredXgbValid - predEval$test
-# 
-# big = ggplot(predEval, aes(x=test,y=ypredXgbValid)) +
-#   geom_point(aes(colour = error)) + scale_colour_gradient2()+
-#   expand_limits(x = 0, y = 0) +
-#   geom_abline(intercept = 0, slope = 1)+
-#   xlab('Price')+
-#   ylab('Prediction')+
-#   ggtitle('Prediction Accuracies')
-# 
-# subHigh = subset(predEval, abs(error) > 1.5)
-# small = ggplot(subHigh, aes(x=test,y=ypredXgbValid)) + 
-#   geom_point(aes(colour = error)) + scale_colour_gradient2()+
-#   expand_limits(x = 0, y = 0) +
-#   geom_abline(intercept = 0, slope = 1)+
-#   xlab('Price')+
-#   ylab('Prediction')+
-#   ggtitle('Prediction Outliers')
-# grid.arrange(big,small,ncol=2)
-# 
-# 
-# 
-# 
-# 
-# 
-# ntrain = nrow(train)
-# zeroPriceIN=funTime[1:ntrain,]
-# zeroPriceIN$price=train[,'price']
-# 
-# zeroPrice = zeroPriceIN %>%
-#   filter(price > 0) %>%
-#   group_by(brand_name,cat1) %>%
-#   summarize(sugPrice = median(price))
-# 
-# zeroPriceIN = zeroPriceIN %>%
-#   left_join(zeroPrice, by=c('brand_name','cat1')) %>%
-#   mutate(price = ifelse(price == 0,sugPrice,price)) %>%
-#   select(-sugPrice)
-# 
-# zeroPriceIN$price = as.numeric(zeroPriceIN$price)
-# train$price = zeroPriceIN$price
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# validation[] = lapply(validation,as.numeric)
-# correlations <- cor(validation)
-# corrPrice <- as.matrix(sort(correlations[,'price'], decreasing = TRUE))
-# corr.idx <- names(which(apply(corrPrice, 1, function(x) (x > 0.06 | x < -0.06))))
-# corrplot(as.matrix(correlations[corr.idx,corr.idx]), type = 'upper', method='color', addCoef.col = 'black', tl.cex = 0.7,cl.cex = 0.7, number.cex=0.6)
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# names = names(trainXG)
-# importance_matrix <- xgb.importance(names, model = xgbModel)
-# options(repr.plot.width=8, repr.plot.height=8)
-# ggplot(importance_matrix,aes(x=reorder(Feature,Gain),y=Gain))+
-#   geom_bar(stat='identity',aes(fill = Gain > 0.003))+
-#   scale_fill_manual(values=c('red','grey'),guide=FALSE) +
-#   coord_flip()+
-#   xlab('Features')+
-#   ylab('Importance')+
-#   ggtitle('Feature Importance')
-# 
-# 
-# 
-# 
-# 
-# rmsePlot = data.frame(xgbModel$evaluation_log)
-# plot(rmsePlot$iter,rmsePlot$train_rmse,col="blue",ylim=c(0,2.5))
-# lines(rmsePlot$iter,rmsePlot$test_rmse,col="red")
-# 
-# 
+
+
+
+
+
+
+predEval = as.data.frame(ypredXgbValid)
+predEval$test = yValidXG
+predEval$error = predEval$ypredXgbValid - predEval$test
+
+big = ggplot(predEval, aes(x=test,y=ypredXgbValid)) +
+  geom_point(aes(colour = error)) + scale_colour_gradient2()+
+  expand_limits(x = 0, y = 0) +
+  geom_abline(intercept = 0, slope = 1)+
+  xlab('Price')+
+  ylab('Prediction')+
+  ggtitle('Prediction Accuracies')
+
+subHigh = subset(predEval, abs(error) > 1.5)
+small = ggplot(subHigh, aes(x=test,y=ypredXgbValid)) + 
+  geom_point(aes(colour = error)) + scale_colour_gradient2()+
+  expand_limits(x = 0, y = 0) +
+  geom_abline(intercept = 0, slope = 1)+
+  xlab('Price')+
+  ylab('Prediction')+
+  ggtitle('Prediction Outliers')
+grid.arrange(big,small,ncol=2)
+
+
+
+
+
+
+ntrain = nrow(train)
+zeroPriceIN=funTime[1:ntrain,]
+zeroPriceIN$price=train[,'price']
+
+zeroPrice = zeroPriceIN %>%
+  filter(price > 0) %>%
+  group_by(brand_name,cat1) %>%
+  summarize(sugPrice = median(price))
+
+zeroPriceIN = zeroPriceIN %>%
+  left_join(zeroPrice, by=c('brand_name','cat1')) %>%
+  mutate(price = ifelse(price == 0,sugPrice,price)) %>%
+  select(-sugPrice)
+
+zeroPriceIN$price = as.numeric(zeroPriceIN$price)
+train$price = zeroPriceIN$price
+
+
+
+
+
+
+
+validation[] = lapply(validation,as.numeric)
+correlations <- cor(validation)
+corrPrice <- as.matrix(sort(correlations[,'price'], decreasing = TRUE))
+corr.idx <- names(which(apply(corrPrice, 1, function(x) (x > 0.06 | x < -0.06))))
+corrplot(as.matrix(correlations[corr.idx,corr.idx]), type = 'upper', method='color', addCoef.col = 'black', tl.cex = 0.7,cl.cex = 0.7, number.cex=0.6)
+
+
+
+
+
+
+
+
+
+names = names(trainXG)
+importance_matrix <- xgb.importance(names, model = xgbModel)
+options(repr.plot.width=8, repr.plot.height=8)
+ggplot(importance_matrix,aes(x=reorder(Feature,Gain),y=Gain))+
+  geom_bar(stat='identity',aes(fill = Gain > 0.003))+
+  scale_fill_manual(values=c('red','grey'),guide=FALSE) +
+  coord_flip()+
+  xlab('Features')+
+  ylab('Importance')+
+  ggtitle('Feature Importance')
+
+
+
+
+
+rmsePlot = data.frame(xgbModel$evaluation_log)
+plot(rmsePlot$iter,rmsePlot$train_rmse,col="blue",ylim=c(0,2.5))
+lines(rmsePlot$iter,rmsePlot$test_rmse,col="red")
+
+
 
 
 
@@ -513,6 +489,11 @@ write.csv(submission,'kernelSub.csv',row.names=FALSE)
 #xgbTune
 #plot(varImp(xgbTune))
 
+
+
+
+
+write.csv(submission,'kernelSub.csv',row.names=FALSE)
 
 
 
