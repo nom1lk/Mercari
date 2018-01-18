@@ -1,3 +1,7 @@
+# Script works when run on Kaggle as a Kernel
+
+
+
 #################################################
 #################################################
 ### IMPORT LIBRARIES AND DATA SETS
@@ -16,7 +20,7 @@ library(gridExtra)
 library(corrplot)
 library(data.table)
 
-# # SC Code
+# # SC Code - silly work around to read in with fread, restart R (studio), and load all libraries but data.table
 # train <- fread("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/train.tsv")
 # test <- fread("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/test.tsv")
 # saveRDS(train, "trainfread.rds")
@@ -33,10 +37,21 @@ library(data.table)
 # all = rbind(within(train,rm('train_id','price')),within(test,rm('test_id')))
 # summary(all)
 
+
+
+# On zenbook TSVs not importing correctly - missing rows - not obvious why
+# train <- fread("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/train.tsv")
+# test <- fread("C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/test.tsv")
+# submission = read.csv('C:/Users/Steve Condylios/Documents/Mercari_Kaggle_ML/input/sample_submission.csv')
+
+
+# Importing from Kaggle Kernel
 train = read.csv('../input/train.tsv', sep='\t')
 test = read.csv('../input/test.tsv', sep='\t')
 submission = read.csv('../input/sample_submission.csv')
-
+all = rbind(within(train,rm('train_id','price')),within(test,rm('test_id')))
+print("train "); nrow(train)
+print("test "); nrow(test)
 
 #### In order to analyze the data more easily, you can split the set:
 
@@ -46,16 +61,16 @@ submission = read.csv('../input/sample_submission.csv')
 ## If you do this, replace 'all' and 'train' with trainNew, and have yourself some fun.
 
 
-summary(train$price)
+#summary(train$price)
 
 
 
 
-options(repr.plot.width=5, repr.plot.height=5)
-a = ggplot(train, aes(x=price))+ geom_histogram(binwidth=30)
+#options(repr.plot.width=5, repr.plot.height=5)
+#a = ggplot(train, aes(x=price))+ geom_histogram(binwidth=30)
 train$price = with(train, ifelse(price > 0, log(price), price))
-b = ggplot(train, aes(x=price))+ geom_histogram(binwidth=0.1)
-grid.arrange(a,b,ncol=2)
+#b = ggplot(train, aes(x=price))+ geom_histogram(binwidth=0.1)
+#grid.arrange(a,b,ncol=2)
 
 
 
